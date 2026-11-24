@@ -13,7 +13,8 @@ while True:
     print("3. Total Spending")
     print("4. Delete Expense")
     print("5. Edit Expense")
-    print("6. Exit")
+    print("6. Search Expense")
+    print("7. Exit")
     choice = int(input("Choose an option: "))
     if choice == 1:
         while True:
@@ -101,16 +102,80 @@ while True:
                         print("Expense name updated!")
                     else:
                         print("Name cannot be empty!")
+                elif edit_choice == "2":
+                    while True:
+                        try:
+                            new_amount = float(input("Enter new expense amount: "))
+
+                            if new_amount > 0:
+                                expense["amount"] = new_amount
+
+                                with open("expenses.json", "w") as file:
+                                    json.dump(expenses, file, indent=4)
+
+                                print("Expense amount updated!")
+                                break
+                            else:
+                                print("Amount must be greater than zero!")
+                        except ValueError:
+                            print("Please enter a valid number!")
                 elif edit_choice == "3":
-                    print("We will add category editing next.")
+                    new_category = input("Enter new expense category: ").strip()
+
+                    if new_category != "":
+                        expense["category"] = new_category
+
+                        with open("expenses.json", "w") as file:
+                            json.dump(expenses, file, indent=4)
+
+                        print("Expense category updated!")
+                    else:
+                        print("Category cannot be empty!")
                 else:
                     print("Invalid choice!")
 
             else:
               print("Invalid expense number!")
-
-
     elif choice == 6:
+        if not expenses:
+            print("No expenses available to search!")
+        else:
+            print("1. Search by Name")
+            print("2. Search by Category")
+
+            search_choice = input("Choose search option: ")
+
+            found = False
+
+            if search_choice == "1":
+                search_text = input("Enter expense name: ").strip().lower()
+
+                for expense in expenses:
+                    if search_text in expense["name"].lower():
+                        print("Name:", expense["name"])
+                        print("Amount:", expense["amount"])
+                        print("Category:", expense["category"])
+                        print("--------------------")
+                        found = True
+
+            elif search_choice == "2":
+                search_text = input("Enter category: ").strip().lower()
+
+                for expense in expenses:
+                    if search_text in expense["category"].lower():
+                        print("Name:", expense["name"])
+                        print("Amount:", expense["amount"])
+                        print("Category:", expense["category"])
+                        print("--------------------")
+                        found = True
+
+            else:
+                print("Invalid search option!")
+
+            if not found and search_choice in ["1", "2"]:
+                print("No matching expense found!")
+
+    elif choice == 7:
         print("Thank you for using Expense Tracker!")
         break
     else:
