@@ -1,5 +1,9 @@
 import json
-expenses =[]
+try:
+    with open("expenses.json", "r") as file:
+        expenses = json.load(file)
+except FileNotFoundError:
+    expenses =[]
 print("===========================")
 print(" Personal Expense Tracker ")
 print("===========================")
@@ -7,13 +11,33 @@ while True:
     print("1. Add Expense")
     print("2. View Expense")
     print("3. Total Spending")
-    print("4. Exit")
-    print("5. Delete Expense")
+    print("4. Delete Expense")
+    print("5. Edit Expense")
+    print("6. Exit")
     choice = int(input("Choose an option: "))
     if choice == 1:
-        expense_name= input("Enter your expense name: ")
-        amount = float(input("Enter your expense amount: "))
-        expense_category = input("Enter your expense category: ")
+        while True:
+            expense_name= input("Enter your expense name: ").strip()
+            if expense_name == "":
+                print("Expense name cannot be empty1!")
+            else:
+                break
+        while True:
+                try:
+                    amount = float(input("Enter your expense amount: "))
+                    if amount <= 0:
+                        print("Amount must be greater than zero!")
+                    else:
+                        break
+                except ValueError:
+                    print("Please enter a valid number!")
+        while True:
+            expense_category = input("Enter your expense category: ").strip()
+
+            if expense_category == "":
+                print("Category cannot be empty!")
+            else:
+                break
         expenses.append({
             "name":expense_name,
             "amount":amount,
@@ -39,23 +63,56 @@ while True:
             total += expense["amount"]
         print("Total spending: ₹", total)
     elif choice == 4:
-        print("Thank you for using Expense Tracker!")
-        break
-    elif choice == 5:
         if not expenses:
             print("No expenses to delete!")
         else:
             for index, expense in enumerate(expenses):
-
                 print(index,".",expense["name"], "-", expense["amount"])
-
             delete_index = int(input("Enter expense number to delete: "))
 
             if 0 <= delete_index < len(expenses):
                 expenses.pop(delete_index)
+                with open("expenses.json", "w") as file:
+                    json.dump(expenses, file, indent=4)
                 print("Expense deleted successfully!")
             else:
                 print("Invalid expense number!")
+    elif choice ==5:
+        if not expenses:
+            print("No expenses to view!")
+        else:
+            for index, expense in enumerate(expenses):
+                print(index+1,expense["name"], "-", expense["amount"])
+            edit_index = int(input("Enter expense number to edit: "))-1
+
+            if 0 <= edit_index < len(expenses):
+                expense=expenses[edit_index]
+                print("Selected: ", expense["name"])
+                print("1. Edit name")
+                print("2. Edit amount")
+                print("3. Edit category")
+                edit_choice = input("What do you want to edit? ")
+                if edit_choice == "1":
+                    new_name = input("Enter new expense name: ").strip()
+                    if new_name != "":
+                        expense["name"] = new_name
+                        with open("expenses.json", "w") as file:
+                            json.dump(expenses, file, indent=4)
+                        print("Expense name updated!")
+                    else:
+                        print("Name cannot be empty!")
+                elif edit_choice == "3":
+                    print("We will add category editing next.")
+                else:
+                    print("Invalid choice!")
+
+            else:
+              print("Invalid expense number!")
+
+
+    elif choice == 6:
+        print("Thank you for using Expense Tracker!")
+        break
     else:
         print("Invalid option!")
 
